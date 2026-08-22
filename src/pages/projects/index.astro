@@ -1,0 +1,35 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+
+const projects = (await getCollection("projects", ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order
+);
+---
+
+<Base
+  title="Projects — Tin Le"
+  description="Side projects and prototypes by Tin Le, spanning C#, ASP.NET Core, Angular, and Python."
+>
+  <header>
+    <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">Projects</h1>
+    <p class="mt-2 max-w-prose text-zinc-600 dark:text-zinc-400">
+      Things I have built outside of work — prototypes, tools, and experiments.
+    </p>
+  </header>
+
+  {
+    projects.length > 0 ? (
+      <div class="mt-8 grid gap-5 sm:grid-cols-2">
+        {projects.map((project) => (
+          <ProjectCard project={project} />
+        ))}
+      </div>
+    ) : (
+      <p class="mt-8 rounded-xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+        Projects coming soon.
+      </p>
+    )
+  }
+</Base>

@@ -1,0 +1,67 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("projects", ({ data }) => !data.draft);
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { title, period, summary, stack, links } = project.data;
+---
+
+<Base title={`${title} — Tin Le`} description={summary}>
+  <article>
+    <a
+      href="/projects/"
+      class="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+    >
+      &larr; All projects
+    </a>
+
+    <header class="mt-4">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4">
+        <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">{title}</h1>
+        <span class="text-sm text-zinc-500">{period}</span>
+      </div>
+
+      <ul class="mt-4 flex flex-wrap gap-1.5">
+        {
+          stack.map((tech) => (
+            <li class="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">
+              {tech}
+            </li>
+          ))
+        }
+      </ul>
+
+      {
+        links && links.length > 0 && (
+          <div class="mt-4 flex flex-wrap gap-3">
+            {links.map((link) => (
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                {link.label} &nearr;
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <hr class="my-8 border-zinc-200 dark:border-zinc-800" />
+
+    <div class="prose prose-zinc max-w-none dark:prose-invert">
+      <Content />
+    </div>
+  </article>
+</Base>
