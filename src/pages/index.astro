@@ -14,10 +14,20 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
     <section>
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-white">
+          <h1
+            id="scramble-name"
+            class="scramble-target text-4xl font-bold tracking-tight text-zinc-900 dark:text-white tabular-nums"
+            aria-label={resume.fullName}
+          >
             {resume.fullName}
           </h1>
-          <p class="mt-1 text-lg text-zinc-500 dark:text-zinc-400">{resume.headline}</p>
+          <p
+            id="scramble-headline"
+            class="scramble-target mt-1 text-lg text-zinc-500 dark:text-zinc-400 tabular-nums"
+            aria-label={resume.headline}
+          >
+            {resume.headline}
+          </p>
         </div>
         <button
           id="print-btn"
@@ -65,12 +75,19 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
       >
         Skills
       </h2>
-      <ul class="mt-4 flex flex-wrap gap-2">
+      <ul class="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-2">
         {
-          resume.skills.map((skill) => (
-            <li class="rounded-full bg-indigo-50 px-3 py-1 text-sm text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">
-              {skill}
-            </li>
+          resume.skills.map((skill, i) => (
+            <>
+              {i > 0 && (
+                <li aria-hidden="true" class="select-none text-zinc-300 dark:text-zinc-700">
+                  ·
+                </li>
+              )}
+              <li class="rounded-full bg-indigo-50 px-3 py-1 text-sm text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">
+                {skill}
+              </li>
+            </>
           ))
         }
       </ul>
@@ -164,6 +181,81 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
   </article>
 
   <script>
+    class TextScramble {
+      constructor(el) {
+        this.el = el;
+        this.chars = "!<>-_\\/[]{}=+*^?#$%&@~|;:,.·";
+        this.frameRequest = null;
+      }
+
+      setText(newText) {
+        const oldText = this.el.textContent ?? "";
+        const length = Math.max(oldText.length, newText.length);
+        const staggerMs = 110;
+        const churnMs = 900;
+
+        if (this.frameRequest) cancelAnimationFrame(this.frameRequest);
+
+        return new Promise((resolve) => {
+          const startTime = performance.now();
+
+          const update = () => {
+            const elapsed = performance.now() - startTime;
+            let output = "";
+            let complete = 0;
+
+            for (let i = 0; i < length; i++) {
+              const from = oldText[i] ?? "";
+              const to = newText[i] ?? "";
+
+              if (to === " ") {
+                output += " ";
+                complete++;
+              } else if (elapsed >= i * staggerMs + churnMs) {
+                output += to;
+                complete++;
+              } else if (!to && elapsed >= i * staggerMs) {
+                output += "";
+                complete++;
+              } else if (elapsed >= i * staggerMs) {
+                output += this.chars[Math.floor(Math.random() * this.chars.length)];
+              } else {
+                output += from;
+                complete++;
+              }
+            }
+
+            this.el.textContent = output;
+
+            if (complete === length) {
+              resolve();
+            } else {
+              this.frameRequest = requestAnimationFrame(update);
+            }
+          };
+
+          update();
+        });
+      }
+    }
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const nameEl = document.getElementById("scramble-name");
+    const headlineEl = document.getElementById("scramble-headline");
+
+    if (!prefersReducedMotion && nameEl && headlineEl) {
+      const nameTarget = nameEl.getAttribute("aria-label") ?? nameEl.textContent ?? "";
+      const headlineTarget = headlineEl.getAttribute("aria-label") ?? headlineEl.textContent ?? "";
+
+      const fxName = new TextScramble(nameEl);
+      const fxHeadline = new TextScramble(headlineEl);
+
+      setTimeout(() => {
+        fxName.setText(nameTarget);
+        setTimeout(() => fxHeadline.setText(headlineTarget), 250);
+      }, 150);
+    }
+
     document.getElementById("print-btn")?.addEventListener("click", () => window.print());
   </script>
 </Base>

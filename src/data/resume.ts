@@ -34,9 +34,9 @@ export const resume: ResumeData = {
   fullName: "Tin Le",
   headline: "Full-Stack .NET / Angular Developer",
   contact: [
-    { label: "Email", value: "tin.le@gmail.com", href: "mailto:tin.le@gmail.com" },
-    { label: "Phone", value: "(401) 234-07369", href: "tel:+140123407369" },
-    { label: "Location", value: "Ho Chi Minh City, Vietnam" },
+    { label: "Email", value: "thanhtin.le.vn@gmail.com", href: "mailto:thanhtin.le.vn@gmail.com" },
+    { label: "Location", value: "Ho Chi Minh City / Remote" },
+    { label: "LinkedIn", value: "linkedin.com/in/thanhtinle", href: "https://www.linkedin.com/in/thanhtinle/" },
     { label: "GitHub", value: "github.com/tinlevn", href: "https://github.com/tinlevn" },
   ],
   summary:
