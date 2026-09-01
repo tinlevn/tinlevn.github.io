@@ -90,7 +90,7 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
               <li
                 draggable="true"
                 aria-label={`Skill: ${skill}`}
-                class={`draggable-skill rounded-full px-3 py-1 text-sm cursor-grab active:cursor-grabbing hover:-translate-y-1 hover:scale-105 transition-transform duration-300 shadow-sm hover:shadow-md ${colorClass}`}
+                class={`draggable-skill rounded-full px-3 py-1 text-sm cursor-grab active:cursor-grabbing hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-sm hover:shadow-md ${colorClass}`}
               >
                 {skill}
               </li>
@@ -265,41 +265,82 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
 
     document.getElementById("print-btn")?.addEventListener("click", () => window.print());
 
-    // Drag and Drop for Skills
+    // Smooth Drag and Drop for Skills
     const skillsList = document.getElementById("skills-list");
-    if (skillsList) {
+    if (skillsList && !prefersReducedMotion) {
       let draggedItem = null;
 
       skillsList.addEventListener("dragstart", (e) => {
         if (e.target && e.target.classList.contains("draggable-skill")) {
           draggedItem = e.target;
+          e.dataTransfer.effectAllowed = 'move';
+
+          // Slight delay to allow the ghost image to be generated before styling
           setTimeout(() => {
-            e.target.classList.add("is-dragging");
-            e.target.style.opacity = "0.5";
+            e.target.classList.add("is-dragging", "opacity-0");
           }, 0);
         }
       });
 
       skillsList.addEventListener("dragend", (e) => {
         if (e.target && e.target.classList.contains("draggable-skill")) {
-          setTimeout(() => {
-            e.target.classList.remove("is-dragging");
-            e.target.style.opacity = "1";
-            draggedItem = null;
-          }, 0);
+          e.target.classList.remove("is-dragging", "opacity-0");
+          draggedItem = null;
+
+          // Remove FLIP inline styles from all elements once drag is done
+          const items = skillsList.querySelectorAll('.draggable-skill');
+          items.forEach(item => {
+            item.style.transform = '';
+            item.style.transition = '';
+          });
         }
       });
 
       skillsList.addEventListener("dragover", (e) => {
         e.preventDefault();
+        if (!draggedItem) return;
+
         const afterElement = getDragAfterElement(skillsList, e.clientX, e.clientY);
-        const currentDraggable = document.querySelector('.draggable-skill.is-dragging');
+        const currentDraggable = document.querySelector('.is-dragging');
+
         if (currentDraggable) {
+          // FLIP Animation Setup: Record initial positions of all items
+          const items = [...skillsList.querySelectorAll('.draggable-skill:not(.is-dragging)')];
+          const initialRects = new Map();
+          items.forEach(item => {
+             initialRects.set(item, item.getBoundingClientRect());
+             // Temporarily disable transition for instant snapping back
+             item.style.transition = 'none';
+          });
+
+          // Mutate DOM
           if (afterElement == null) {
             skillsList.appendChild(currentDraggable);
           } else {
-            skillsList.insertBefore(currentDraggable, afterElement);
+            if (currentDraggable !== afterElement) {
+              skillsList.insertBefore(currentDraggable, afterElement);
+            }
           }
+
+          // FLIP Animation Play: Calculate diff and animate
+          items.forEach(item => {
+            const initialRect = initialRects.get(item);
+            const finalRect = item.getBoundingClientRect();
+
+            const deltaX = initialRect.left - finalRect.left;
+            const deltaY = initialRect.top - finalRect.top;
+
+            if (deltaX !== 0 || deltaY !== 0) {
+              // Invert: transform to original position
+              item.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+              // Play: transition to new position (0, 0)
+              requestAnimationFrame(() => {
+                item.style.transition = 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)'; // Bouncy spring feel
+                item.style.transform = 'translate(0, 0)';
+              });
+            }
+          });
         }
       });
 
@@ -308,12 +349,10 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
 
         return draggableElements.reduce((closest, child) => {
           const box = child.getBoundingClientRect();
-          // We look at both horizontal and vertical positions because it's a flex-wrap container
           const offsetX = x - box.left - box.width / 2;
           const offsetY = y - box.top - box.height / 2;
           const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
 
-          // Basic heuristic: find the closest element in 2D space
           if (distance < closest.distance) {
             return { offset: distance, element: child, distance: distance };
           } else {
