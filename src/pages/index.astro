@@ -73,9 +73,9 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
         id="skills-heading"
         class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400"
       >
-        Skills
+        Skills <span class="ml-2 text-[10px] font-normal normal-case text-zinc-400 dark:text-zinc-500">(Drag to rearrange)</span>
       </h2>
-      <ul class="mt-4 flex flex-wrap items-center gap-2">
+      <ul id="skills-list" class="mt-4 flex flex-wrap items-center gap-2">
         {
           resume.skills.map((skill, i) => {
             const colors = [
@@ -87,7 +87,11 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
             ];
             const colorClass = colors[i % colors.length];
             return (
-              <li class={`rounded-full px-3 py-1 text-sm cursor-pointer hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-sm hover:shadow-md ${colorClass}`}>
+              <li
+                draggable="true"
+                aria-label={`Skill: ${skill}`}
+                class={`draggable-skill rounded-full px-3 py-1 text-sm cursor-grab active:cursor-grabbing hover:-translate-y-1 hover:scale-105 transition-transform duration-300 shadow-sm hover:shadow-md ${colorClass}`}
+              >
                 {skill}
               </li>
             );
@@ -260,5 +264,63 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
     }
 
     document.getElementById("print-btn")?.addEventListener("click", () => window.print());
+
+    // Drag and Drop for Skills
+    const skillsList = document.getElementById("skills-list");
+    if (skillsList) {
+      let draggedItem = null;
+
+      skillsList.addEventListener("dragstart", (e) => {
+        if (e.target && e.target.classList.contains("draggable-skill")) {
+          draggedItem = e.target;
+          setTimeout(() => {
+            e.target.classList.add("is-dragging");
+            e.target.style.opacity = "0.5";
+          }, 0);
+        }
+      });
+
+      skillsList.addEventListener("dragend", (e) => {
+        if (e.target && e.target.classList.contains("draggable-skill")) {
+          setTimeout(() => {
+            e.target.classList.remove("is-dragging");
+            e.target.style.opacity = "1";
+            draggedItem = null;
+          }, 0);
+        }
+      });
+
+      skillsList.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        const afterElement = getDragAfterElement(skillsList, e.clientX, e.clientY);
+        const currentDraggable = document.querySelector('.draggable-skill.is-dragging');
+        if (currentDraggable) {
+          if (afterElement == null) {
+            skillsList.appendChild(currentDraggable);
+          } else {
+            skillsList.insertBefore(currentDraggable, afterElement);
+          }
+        }
+      });
+
+      function getDragAfterElement(container, x, y) {
+        const draggableElements = [...container.querySelectorAll('.draggable-skill:not(.is-dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+          const box = child.getBoundingClientRect();
+          // We look at both horizontal and vertical positions because it's a flex-wrap container
+          const offsetX = x - box.left - box.width / 2;
+          const offsetY = y - box.top - box.height / 2;
+          const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+
+          // Basic heuristic: find the closest element in 2D space
+          if (distance < closest.distance) {
+            return { offset: distance, element: child, distance: distance };
+          } else {
+            return closest;
+          }
+        }, { distance: Number.POSITIVE_INFINITY }).element;
+      }
+    }
   </script>
 </Base>
