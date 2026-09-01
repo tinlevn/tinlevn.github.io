@@ -40,10 +40,9 @@ export const resume: ResumeData = {
     { label: "GitHub", value: "github.com/tinlevn", href: "https://github.com/tinlevn" },
   ],
   summary:
-    "Full-stack developer with 4+ years shipping scalable, cloud-native web applications using C#, ASP.NET Core (.NET 6–10), and Angular (14–22) across fintech, aviation, and public-sector environments. " +
-    "Deep expertise in Entity Framework Core, LINQ, and relational database design (SQL Server, PostgreSQL, MySQL), with a strong architectural foundation in SOLID principles, Clean/Onion Architecture, Domain-Driven Design, and the Repository pattern. " +
-    "Hands-on with cloud and DevOps tooling: Azure App Services, Azure Data Factory, Azure DevOps Pipelines, AWS, Docker, and Terraform for Infrastructure as Code. " +
-    "Proven Agile/Scrum collaborator delivering for an ASX-listed wealth management platform (Netwealth), a major U.S. airline (American Airlines), and a public water utility (MWRA).",
+    "Passionate full-stack developer with 4+ years shipping scalable, cloud-native web applications. " +
+    "I specialize in C#, ASP.NET Core, and Angular, and I have a proven track record delivering impactful solutions across fintech, aviation, and public-sector environments. " +
+    "I'm deeply hands-on with relational databases, cloud tooling (Azure, AWS), and CI/CD pipelines, always striving for clean architecture and robust deployment practices.",
   skills: [
     "C#",
     "TypeScript",
@@ -88,7 +87,7 @@ export const resume: ResumeData = {
         "Build and maintain enterprise applications in C# and ASP.NET Core (MVC, Web API, REST) following SOLID, Clean Architecture, and Domain-Driven Design.",
         "Design and deploy microservices on Azure Cloud Services with a focus on scalability and reliability.",
         "Optimize data access layers using EF Core against SQL Server, including query and indexing tuning.",
-        "Drive Agile/Scrum ceremonies — sprint planning, code reviews, and retrospectives — to ship high-quality releases.",
+        "Drive Agile/Scrum ceremonies (sprint planning, code reviews, and retrospectives) to ship high-quality releases.",
         "Maintain test coverage through unit and integration testing, and manage version control and CI/CD workflows across the team.",
       ],
     },

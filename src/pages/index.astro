@@ -11,7 +11,7 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
 
 <Base title={`${resume.fullName} — ${resume.headline}`} description={resume.summary}>
   <article class="space-y-12">
-    <section>
+    <section class="animate-fade-in-up" style="animation-delay: 0.1s">
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1
@@ -68,32 +68,35 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
       </p>
     </section>
 
-    <section aria-labelledby="skills-heading">
+    <section aria-labelledby="skills-heading" class="animate-fade-in-up" style="animation-delay: 0.2s">
       <h2
         id="skills-heading"
         class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400"
       >
         Skills
       </h2>
-      <ul class="mt-4 flex flex-wrap items-center gap-x-2.5 gap-y-2">
+      <ul class="mt-4 flex flex-wrap items-center gap-2">
         {
-          resume.skills.map((skill, i) => (
-            <>
-              {i > 0 && (
-                <li aria-hidden="true" class="select-none text-zinc-300 dark:text-zinc-700">
-                  ·
-                </li>
-              )}
-              <li class="rounded-full bg-indigo-50 px-3 py-1 text-sm text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">
+          resume.skills.map((skill, i) => {
+            const colors = [
+              "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300",
+              "bg-pink-50 text-pink-700 dark:bg-pink-950/60 dark:text-pink-300",
+              "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300",
+              "bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300",
+              "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300"
+            ];
+            const colorClass = colors[i % colors.length];
+            return (
+              <li class={`rounded-full px-3 py-1 text-sm cursor-pointer hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-sm hover:shadow-md ${colorClass}`}>
                 {skill}
               </li>
-            </>
-          ))
+            );
+          })
         }
       </ul>
     </section>
 
-    <section aria-labelledby="experience-heading">
+    <section aria-labelledby="experience-heading" class="animate-fade-in-up" style="animation-delay: 0.3s">
       <h2
         id="experience-heading"
         class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400"
@@ -103,10 +106,10 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
       <div class="mt-4 space-y-8">
         {
           resume.experience.map((job) => (
-            <article class="break-inside-avoid">
+            <article class="break-inside-avoid hover:shadow-lg hover:-translate-y-1 transition-all duration-300 rounded-xl p-5 -mx-5 bg-transparent hover:bg-white dark:hover:bg-zinc-900">
               <div class="flex flex-wrap items-baseline justify-between gap-x-4">
-                <h3 class="font-semibold text-zinc-900 dark:text-white">
-                  {job.title} &middot; {job.company}
+                <h3 class="font-semibold text-zinc-900 dark:text-white inline-block">
+                  {job.title} <span class="mx-1 text-zinc-400 dark:text-zinc-600 text-[10px]">&bull;</span> {job.company}
                 </h3>
                 <span class="text-xs text-zinc-500">{job.date}</span>
               </div>
@@ -120,7 +123,7 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
       </div>
     </section>
 
-    <section aria-labelledby="projects-heading">
+    <section aria-labelledby="projects-heading" class="animate-fade-in-up" style="animation-delay: 0.4s">
       <h2
         id="projects-heading"
         class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400"
@@ -142,7 +145,7 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
       }
     </section>
 
-    <section aria-labelledby="education-heading">
+    <section aria-labelledby="education-heading" class="animate-fade-in-up" style="animation-delay: 0.5s">
       <h2
         id="education-heading"
         class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400"
@@ -152,7 +155,7 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
       <div class="mt-4 space-y-6">
         {
           resume.education.map((edu) => (
-            <article class="break-inside-avoid">
+            <article class="break-inside-avoid hover:shadow-lg hover:-translate-y-1 transition-all duration-300 rounded-xl p-5 -mx-5 bg-transparent hover:bg-white dark:hover:bg-zinc-900">
               <div class="flex flex-wrap items-baseline justify-between gap-x-4">
                 <h3 class="font-semibold text-zinc-900 dark:text-white">{edu.institution}</h3>
                 <span class="text-xs text-zinc-500">{edu.period}</span>
@@ -167,7 +170,7 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
       </div>
     </section>
 
-    <section aria-labelledby="awards-heading">
+    <section aria-labelledby="awards-heading" class="animate-fade-in-up" style="animation-delay: 0.6s">
       <h2
         id="awards-heading"
         class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400"
