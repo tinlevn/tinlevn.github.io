@@ -1,5 +1,5 @@
 ---
-title: Smeexer — Cryptocurrency Private Seed Mixers
+title: Smeexer — Keyboard E-commerce
 period: "2021 – 2022"
 summary: E-commerce prototype for mechanical keyboard products with cart and Stripe payment integration.
 stack:

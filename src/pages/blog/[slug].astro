@@ -1,9 +1,10 @@
 ---
-import { getCollection, render } from "astro:content";
+import { render } from "astro:content";
 import Base from "../../layouts/Base.astro";
+import { formatDate, getPublishedPosts } from "../../utils/collections";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  const posts = await getPublishedPosts();
   return posts.map((post) => ({
     params: { slug: post.id },
     props: { post },
@@ -13,11 +14,7 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 
-const formattedDate = post.data.pubDate.toLocaleDateString("en-US", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
+const formattedDate = formatDate(post.data.pubDate);
 ---
 
 <Base title={`${post.data.title} — Tin Le`} description={post.data.description}>
@@ -30,7 +27,7 @@ const formattedDate = post.data.pubDate.toLocaleDateString("en-US", {
       <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
         {post.data.title}
       </h1>
-      <time class="mt-2 block text-sm text-zinc-500" datetime={post.data.pubDate.toISOString()}>
+      <time class="mt-2 block text-sm text-zinc-600 dark:text-zinc-400" datetime={post.data.pubDate.toISOString()}>
         {formattedDate}
       </time>
     </header>

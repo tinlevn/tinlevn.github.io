@@ -1,11 +1,9 @@
 ---
-import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
+import { getPublishedProjects } from "../../utils/collections";
 
-const projects = (await getCollection("projects", ({ data }) => !data.draft)).sort(
-  (a, b) => a.data.order - b.data.order
-);
+const projects = await getPublishedProjects();
 ---
 
 <Base
@@ -18,6 +16,8 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
       Things I have built outside of work — prototypes, tools, and experiments.
     </p>
   </header>
+
+  {projects.length > 0 && <h2 class="sr-only">Project list</h2>}
 
   {
     projects.length > 0 ? (

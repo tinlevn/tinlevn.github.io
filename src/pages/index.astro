@@ -2,11 +2,9 @@
 import Base from "../layouts/Base.astro";
 import ProjectCard from "../components/ProjectCard.astro";
 import { resume } from "../data/resume";
-import { getCollection } from "astro:content";
+import { getPublishedProjects } from "../utils/collections";
 
-const projects = (await getCollection("projects", ({ data }) => !data.draft)).sort(
-  (a, b) => a.data.order - b.data.order
-);
+const projects = await getPublishedProjects();
 ---
 
 <Base title={`${resume.fullName} — ${resume.headline}`} description={resume.summary}>
@@ -49,12 +47,12 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
                   target={item.href.startsWith("http") ? "_blank" : undefined}
                   class="inline-block rounded-full border border-zinc-200 bg-white px-3 py-1 text-sm text-zinc-600 transition hover:border-indigo-300 hover:text-indigo-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
                 >
-                  <span class="font-medium text-zinc-500 dark:text-zinc-500">{item.label}:</span>{" "}
+                  <span class="font-medium text-zinc-600 dark:text-zinc-400">{item.label}:</span>{" "}
                   {item.value}
                 </a>
               ) : (
                 <span class="inline-block rounded-full border border-zinc-200 bg-white px-3 py-1 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-                  <span class="font-medium text-zinc-500 dark:text-zinc-500">{item.label}:</span>{" "}
+                  <span class="font-medium text-zinc-600 dark:text-zinc-400">{item.label}:</span>{" "}
                   {item.value}
                 </span>
               )}
@@ -73,7 +71,7 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
         id="skills-heading"
         class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400"
       >
-        Skills <span class="ml-2 text-[10px] font-normal normal-case text-zinc-400 dark:text-zinc-500">(Drag to rearrange)</span>
+        Skills <span class="ml-2 text-[10px] font-normal normal-case text-zinc-500 dark:text-zinc-400">(Drag to rearrange)</span>
       </h2>
       <ul id="skills-list" class="mt-4 flex flex-wrap items-center gap-2">
         {
@@ -113,11 +111,11 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
             <article class="break-inside-avoid hover:shadow-lg hover:-translate-y-1 transition-all duration-300 rounded-xl p-5 -mx-5 bg-transparent hover:bg-white dark:hover:bg-zinc-900">
               <div class="flex flex-wrap items-baseline justify-between gap-x-4">
                 <h3 class="font-semibold text-zinc-900 dark:text-white inline-block">
-                  {job.title} <span class="mx-1 text-zinc-400 dark:text-zinc-600 text-[10px]">&bull;</span> {job.company}
+                  {job.title} <span class="mx-1 text-zinc-500 dark:text-zinc-400 text-[10px]">&bull;</span> {job.company}
                 </h3>
-                <span class="text-xs text-zinc-500">{job.date}</span>
+                <span class="text-xs text-zinc-600 dark:text-zinc-400">{job.period}</span>
               </div>
-              <p class="text-sm text-zinc-500">{job.location}</p>
+              <p class="text-sm text-zinc-600 dark:text-zinc-400">{job.location}</p>
               <ul class="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                 {job.bullets.map((bullet) => <li>{bullet}</li>)}
               </ul>
@@ -138,7 +136,7 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
         {projects.slice(0, 2).map((project) => <ProjectCard project={project} />)}
       </div>
       {
-        projects.length > 0 && (
+        projects.length > 2 && (
           <a
             href="/projects/"
             class="mt-5 inline-block text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
@@ -162,9 +160,9 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
             <article class="break-inside-avoid hover:shadow-lg hover:-translate-y-1 transition-all duration-300 rounded-xl p-5 -mx-5 bg-transparent hover:bg-white dark:hover:bg-zinc-900">
               <div class="flex flex-wrap items-baseline justify-between gap-x-4">
                 <h3 class="font-semibold text-zinc-900 dark:text-white">{edu.institution}</h3>
-                <span class="text-xs text-zinc-500">{edu.period}</span>
+                <span class="text-xs text-zinc-600 dark:text-zinc-400">{edu.period}</span>
               </div>
-              <p class="text-sm text-zinc-500">{edu.degree}</p>
+              <p class="text-sm text-zinc-600 dark:text-zinc-400">{edu.degree}</p>
               <p class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
                 {edu.details}
               </p>
@@ -189,13 +187,17 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
 
   <script>
     class TextScramble {
-      constructor(el) {
+      el: HTMLElement;
+      chars: string;
+      frameRequest: number | null;
+
+      constructor(el: HTMLElement) {
         this.el = el;
         this.chars = "!<>-_\\/[]{}=+*^?#$%&@~|;:,.·";
         this.frameRequest = null;
       }
 
-      setText(newText) {
+      setText(newText: string): Promise<void> {
         const oldText = this.el.textContent ?? "";
         const length = Math.max(oldText.length, newText.length);
         const staggerMs = 110;
@@ -265,100 +267,90 @@ const projects = (await getCollection("projects", ({ data }) => !data.draft)).so
 
     document.getElementById("print-btn")?.addEventListener("click", () => window.print());
 
-    // Smooth Drag and Drop for Skills
+    // Drag-to-reorder skills (pointer events: works on mouse, touch, and pen)
     const skillsList = document.getElementById("skills-list");
     if (skillsList && !prefersReducedMotion) {
-      let draggedItem = null;
+      const DRAG_TRANSITION = "transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)";
+      let draggedItem: HTMLElement | null = null;
 
-      skillsList.addEventListener("dragstart", (e) => {
-        if (e.target && e.target.classList.contains("draggable-skill")) {
-          draggedItem = e.target;
-          e.dataTransfer.effectAllowed = 'move';
-
-          // Slight delay to allow the ghost image to be generated before styling
-          setTimeout(() => {
-            e.target.classList.add("is-dragging", "opacity-0");
-          }, 0);
+      const onPointerDown = (e: PointerEvent) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        const target = e.target;
+        if (target instanceof HTMLElement && target.classList.contains("draggable-skill")) {
+          draggedItem = target;
+          target.setPointerCapture(e.pointerId);
+          target.classList.add("is-dragging");
         }
-      });
+      };
 
-      skillsList.addEventListener("dragend", (e) => {
-        if (e.target && e.target.classList.contains("draggable-skill")) {
-          e.target.classList.remove("is-dragging", "opacity-0");
-          draggedItem = null;
-
-          // Remove FLIP inline styles from all elements once drag is done
-          const items = skillsList.querySelectorAll('.draggable-skill');
-          items.forEach(item => {
-            item.style.transform = '';
-            item.style.transition = '';
-          });
-        }
-      });
-
-      skillsList.addEventListener("dragover", (e) => {
-        e.preventDefault();
+      const onPointerMove = (e: PointerEvent) => {
         if (!draggedItem) return;
+        e.preventDefault();
+
+        const initialRects = new Map<Element, DOMRect>();
+        const items = Array.from(
+          skillsList.querySelectorAll(".draggable-skill:not(.is-dragging)")
+        ) as HTMLElement[];
+        items.forEach((item) => {
+          initialRects.set(item, item.getBoundingClientRect());
+          item.style.transition = "none";
+        });
 
         const afterElement = getDragAfterElement(skillsList, e.clientX, e.clientY);
-        const currentDraggable = document.querySelector('.is-dragging');
-
-        if (currentDraggable) {
-          // FLIP Animation Setup: Record initial positions of all items
-          const items = [...skillsList.querySelectorAll('.draggable-skill:not(.is-dragging)')];
-          const initialRects = new Map();
-          items.forEach(item => {
-             initialRects.set(item, item.getBoundingClientRect());
-             // Temporarily disable transition for instant snapping back
-             item.style.transition = 'none';
-          });
-
-          // Mutate DOM
-          if (afterElement == null) {
-            skillsList.appendChild(currentDraggable);
-          } else {
-            if (currentDraggable !== afterElement) {
-              skillsList.insertBefore(currentDraggable, afterElement);
-            }
-          }
-
-          // FLIP Animation Play: Calculate diff and animate
-          items.forEach(item => {
-            const initialRect = initialRects.get(item);
-            const finalRect = item.getBoundingClientRect();
-
-            const deltaX = initialRect.left - finalRect.left;
-            const deltaY = initialRect.top - finalRect.top;
-
-            if (deltaX !== 0 || deltaY !== 0) {
-              // Invert: transform to original position
-              item.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-              // Play: transition to new position (0, 0)
-              requestAnimationFrame(() => {
-                item.style.transition = 'transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)'; // Bouncy spring feel
-                item.style.transform = 'translate(0, 0)';
-              });
-            }
-          });
+        if (afterElement == null) {
+          skillsList.appendChild(draggedItem);
+        } else if (draggedItem !== afterElement) {
+          skillsList.insertBefore(draggedItem, afterElement);
         }
-      });
 
-      function getDragAfterElement(container, x, y) {
-        const draggableElements = [...container.querySelectorAll('.draggable-skill:not(.is-dragging)')];
+        items.forEach((item) => {
+          const initialRect = initialRects.get(item);
+          if (!initialRect) return;
+          const finalRect = item.getBoundingClientRect();
+          const deltaX = initialRect.left - finalRect.left;
+          const deltaY = initialRect.top - finalRect.top;
 
-        return draggableElements.reduce((closest, child) => {
-          const box = child.getBoundingClientRect();
-          const offsetX = x - box.left - box.width / 2;
-          const offsetY = y - box.top - box.height / 2;
-          const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-
-          if (distance < closest.distance) {
-            return { offset: distance, element: child, distance: distance };
-          } else {
-            return closest;
+          if (deltaX !== 0 || deltaY !== 0) {
+            item.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            requestAnimationFrame(() => {
+              item.style.transition = DRAG_TRANSITION;
+              item.style.transform = "translate(0, 0)";
+            });
           }
-        }, { distance: Number.POSITIVE_INFINITY }).element;
+        });
+      };
+
+      const endDrag = () => {
+        if (!draggedItem) return;
+        draggedItem.classList.remove("is-dragging");
+        draggedItem = null;
+        const items = skillsList.querySelectorAll(".draggable-skill") as NodeListOf<HTMLElement>;
+        items.forEach((item) => {
+          item.style.transform = "";
+          item.style.transition = "";
+        });
+      };
+
+      skillsList.addEventListener("pointerdown", onPointerDown);
+      skillsList.addEventListener("pointermove", onPointerMove);
+      skillsList.addEventListener("pointerup", endDrag);
+      skillsList.addEventListener("pointercancel", endDrag);
+
+      function getDragAfterElement(container: HTMLElement, x: number, y: number): Element | null {
+        const elements = container.querySelectorAll(".draggable-skill:not(.is-dragging)");
+        let closest = null;
+        let closestDistance = Number.POSITIVE_INFINITY;
+        elements.forEach((child) => {
+          const box = child.getBoundingClientRect();
+          const dx = x - (box.left + box.width / 2);
+          const dy = y - (box.top + box.height / 2);
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closest = child;
+          }
+        });
+        return closest;
       }
     }
   </script>

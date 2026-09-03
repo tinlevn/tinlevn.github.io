@@ -8,7 +8,7 @@ export interface Experience {
   title: string;
   company: string;
   location: string;
-  date: string;
+  period: string;
   bullets: string[];
 }
 
@@ -81,7 +81,7 @@ export const resume: ResumeData = {
       title: "Full Stack Software Developer",
       company: "Orient Software · Client: Netwealth Australia (ASX: NWL)",
       location: "Ho Chi Minh City, Vietnam",
-      date: "Jun 2025 – Present",
+      period: "Jun 2025 – Present",
       bullets: [
         "Technologies: .NET 10, Angular 22, TypeScript, Azure Cloud, Azure DevOps, SSMS.",
         "Build and maintain enterprise applications in C# and ASP.NET Core (MVC, Web API, REST) following SOLID, Clean Architecture, and Domain-Driven Design.",
@@ -95,7 +95,7 @@ export const resume: ResumeData = {
       title: "Software Developer",
       company: "Officience",
       location: "Ho Chi Minh City, Vietnam",
-      date: "Jun 2024 – Jun 2025",
+      period: "Jun 2024 – Jun 2025",
       bullets: [
         "Technologies: .NET 8, Angular 16+, PostgreSQL, Power Automate, AWS, Terraform.",
         "Led client-side migration of a Web API backend from .NET 6 to .NET 8.",
@@ -107,7 +107,7 @@ export const resume: ResumeData = {
       title: "Full Stack Developer",
       company: "American Airlines",
       location: "Dallas, TX",
-      date: "Mar 2024 – Jun 2024",
+      period: "Mar 2024 – Jun 2024",
       bullets: [
         "Technologies: .NET 6–8, PostgreSQL, Angular 16+, Azure Data Factory.",
         "Partnered with technical and non-technical stakeholders to translate business requirements into working solutions.",
@@ -122,7 +122,7 @@ export const resume: ResumeData = {
       title: "Application Developer",
       company: "Massachusetts Water Resources Authority (MWRA)",
       location: "Chelsea, MA",
-      date: "Mar 2022 – Jan 2024",
+      period: "Mar 2022 – Jan 2024",
       bullets: [
         "Technologies: VB.NET, .NET 6, T-SQL, ASP.NET Core MVC, Angular 14+.",
         "Supported MWRA, a public authority delivering wholesale water and sewer services to 3M+ residents across eastern and central Massachusetts.",

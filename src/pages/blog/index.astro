@@ -1,18 +1,8 @@
 ---
-import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
+import { formatDate, getPublishedPosts } from "../../utils/collections";
 
-const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
-
-function formatDate(date: Date): string {
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
+const posts = await getPublishedPosts();
 ---
 
 <Base
@@ -31,7 +21,7 @@ function formatDate(date: Date): string {
       <div class="mt-8 divide-y divide-zinc-200 dark:divide-zinc-800">
         {posts.map((post) => (
           <article class="py-6">
-            <time class="text-xs text-zinc-500" datetime={post.data.pubDate.toISOString()}>
+            <time class="text-xs text-zinc-600 dark:text-zinc-400" datetime={post.data.pubDate.toISOString()}>
               {formatDate(post.data.pubDate)}
             </time>
             <h2 class="mt-1 font-semibold text-zinc-900 dark:text-white">
