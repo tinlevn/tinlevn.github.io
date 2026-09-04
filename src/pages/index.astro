@@ -48,12 +48,12 @@ const projects = await getPublishedProjects();
                   target={item.href.startsWith("http") ? "_blank" : undefined}
                   class="inline-block rounded-full border border-zinc-200 bg-white px-3 py-1 text-sm text-zinc-600 transition hover:border-indigo-300 hover:text-indigo-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
                 >
-                  <span class="font-medium text-zinc-600 dark:text-zinc-400">{item.label}:</span>{" "}
+                  <span class="font-medium text-zinc-600 dark:text-zinc-400">{item.label}</span>{" "}
                   {item.value}
                 </a>
               ) : (
                 <span class="inline-block rounded-full border border-zinc-200 bg-white px-3 py-1 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-                  <span class="font-medium text-zinc-600 dark:text-zinc-400">{item.label}:</span>{" "}
+                  <span class="font-medium text-zinc-600 dark:text-zinc-400">{item.label}</span>{" "}
                   {item.value}
                 </span>
               )}
@@ -72,9 +72,9 @@ const projects = await getPublishedProjects();
         id="skills-heading"
         class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400"
       >
-        Skills <span class="ml-2 text-[10px] font-normal normal-case text-zinc-500 dark:text-zinc-400">(Drag to rearrange)</span>
+        Skills
       </h2>
-      <ul id="skills-list" class="mt-4 flex flex-wrap items-center gap-2">
+      <ul class="mt-4 flex flex-wrap items-center gap-x-1 gap-y-2">
         {
           resume.skills.map((skill, i) => {
             const colors = [
@@ -86,13 +86,16 @@ const projects = await getPublishedProjects();
             ];
             const colorClass = colors[i % colors.length];
             return (
-              <li
-                draggable="true"
-                aria-label={`Skill: ${skill}`}
-                class={`draggable-skill rounded-full px-3 py-1 text-sm cursor-grab active:cursor-grabbing hover:-translate-y-1 hover:scale-105 transition-all duration-300 shadow-sm hover:shadow-md ${colorClass}`}
-              >
-                {skill}
-              </li>
+              <>
+                <li
+                  class={`rounded-full px-3 py-1 text-sm ${colorClass}`}
+                >
+                  {skill}
+                </li>
+                {i < resume.skills.length - 1 && (
+                  <li aria-hidden="true" class="text-zinc-300 dark:text-zinc-600 select-none">·</li>
+                )}
+              </>
             );
           })
         }
@@ -249,110 +252,27 @@ const projects = await getPublishedProjects();
       }
     }
 
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const nameEl = document.getElementById("scramble-name");
-    const headlineEl = document.getElementById("scramble-headline");
+    function initPage() {
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const nameEl = document.getElementById("scramble-name");
+      const headlineEl = document.getElementById("scramble-headline");
 
-    if (!prefersReducedMotion && nameEl && headlineEl) {
-      const nameTarget = nameEl.getAttribute("aria-label") ?? nameEl.textContent ?? "";
-      const headlineTarget = headlineEl.getAttribute("aria-label") ?? headlineEl.textContent ?? "";
+      if (!prefersReducedMotion && nameEl && headlineEl) {
+        const nameTarget = nameEl.getAttribute("aria-label") ?? nameEl.textContent ?? "";
+        const headlineTarget = headlineEl.getAttribute("aria-label") ?? headlineEl.textContent ?? "";
 
-      const fxName = new TextScramble(nameEl);
-      const fxHeadline = new TextScramble(headlineEl);
+        const fxName = new TextScramble(nameEl);
+        const fxHeadline = new TextScramble(headlineEl);
 
-      setTimeout(() => {
-        fxName.setText(nameTarget);
-        setTimeout(() => fxHeadline.setText(headlineTarget), 250);
-      }, 150);
-    }
-
-    document.getElementById("print-btn")?.addEventListener("click", () => window.print());
-
-    // Drag-to-reorder skills (pointer events: works on mouse, touch, and pen)
-    const skillsList = document.getElementById("skills-list");
-    if (skillsList && !prefersReducedMotion) {
-      const DRAG_TRANSITION = "transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)";
-      let draggedItem: HTMLElement | null = null;
-
-      const onPointerDown = (e: PointerEvent) => {
-        if (e.pointerType === "mouse" && e.button !== 0) return;
-        const target = e.target;
-        if (target instanceof HTMLElement && target.classList.contains("draggable-skill")) {
-          draggedItem = target;
-          target.setPointerCapture(e.pointerId);
-          target.classList.add("is-dragging");
-        }
-      };
-
-      const onPointerMove = (e: PointerEvent) => {
-        if (!draggedItem) return;
-        e.preventDefault();
-
-        const initialRects = new Map<Element, DOMRect>();
-        const items = Array.from(
-          skillsList.querySelectorAll(".draggable-skill:not(.is-dragging)")
-        ) as HTMLElement[];
-        items.forEach((item) => {
-          initialRects.set(item, item.getBoundingClientRect());
-          item.style.transition = "none";
-        });
-
-        const afterElement = getDragAfterElement(skillsList, e.clientX, e.clientY);
-        if (afterElement == null) {
-          skillsList.appendChild(draggedItem);
-        } else if (draggedItem !== afterElement) {
-          skillsList.insertBefore(draggedItem, afterElement);
-        }
-
-        items.forEach((item) => {
-          const initialRect = initialRects.get(item);
-          if (!initialRect) return;
-          const finalRect = item.getBoundingClientRect();
-          const deltaX = initialRect.left - finalRect.left;
-          const deltaY = initialRect.top - finalRect.top;
-
-          if (deltaX !== 0 || deltaY !== 0) {
-            item.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-            requestAnimationFrame(() => {
-              item.style.transition = DRAG_TRANSITION;
-              item.style.transform = "translate(0, 0)";
-            });
-          }
-        });
-      };
-
-      const endDrag = () => {
-        if (!draggedItem) return;
-        draggedItem.classList.remove("is-dragging");
-        draggedItem = null;
-        const items = skillsList.querySelectorAll(".draggable-skill") as NodeListOf<HTMLElement>;
-        items.forEach((item) => {
-          item.style.transform = "";
-          item.style.transition = "";
-        });
-      };
-
-      skillsList.addEventListener("pointerdown", onPointerDown);
-      skillsList.addEventListener("pointermove", onPointerMove);
-      skillsList.addEventListener("pointerup", endDrag);
-      skillsList.addEventListener("pointercancel", endDrag);
-
-      function getDragAfterElement(container: HTMLElement, x: number, y: number): Element | null {
-        const elements = container.querySelectorAll(".draggable-skill:not(.is-dragging)");
-        let closest = null;
-        let closestDistance = Number.POSITIVE_INFINITY;
-        elements.forEach((child) => {
-          const box = child.getBoundingClientRect();
-          const dx = x - (box.left + box.width / 2);
-          const dy = y - (box.top + box.height / 2);
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance < closestDistance) {
-            closestDistance = distance;
-            closest = child;
-          }
-        });
-        return closest;
+        setTimeout(() => {
+          fxName.setText(nameTarget);
+          setTimeout(() => fxHeadline.setText(headlineTarget), 250);
+        }, 150);
       }
+
+      document.getElementById("print-btn")?.addEventListener("click", () => window.print());
     }
+
+    document.addEventListener("astro:page-load", initPage);
   </script>
 </Base>

@@ -43,15 +43,6 @@ html {
   opacity: 0;
 }
 
-/* Skill drag-and-drop (pointer events: touch action must be disabled before gesture) */
-.draggable-skill {
-  touch-action: none;
-}
-
-.draggable-skill.is-dragging {
-  opacity: 0;
-}
-
 /* ── Layered 3D Button (from btns project) ── */
 .btn-layered-3d,
 .btn-layered-3d > *,
