@@ -21,7 +21,6 @@ const navItems = [
   { href: "/", label: "CV" },
   { href: "/projects/", label: "Projects" },
   { href: "/about/", label: "About" },
-  { href: "/blog/", label: "Blog" },
 ];
 
 function normalize(p: string): string {
@@ -91,10 +90,10 @@ const year = new Date().getFullYear();
                     href={item.href}
                     aria-current={isActive(item.href) ? "page" : undefined}
                     class:list={[
-                      "rounded-md px-2.5 py-2 text-sm transition",
+                      "btn-top-3d",
                       isActive(item.href)
-                        ? "font-medium text-indigo-600 dark:text-indigo-400"
-                        : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white",
+                        ? "btn-top-3d--nav-active"
+                        : "btn-top-3d--nav",
                     ]}
                   >
                     {item.label}
