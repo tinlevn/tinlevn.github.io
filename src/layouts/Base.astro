@@ -34,6 +34,7 @@ function isActive(href: string): boolean {
   return path === target || path.startsWith(`${target}/`);
 }
 
+const hasHeaderTitle = Astro.slots.has("header-title");
 const year = new Date().getFullYear();
 ---
 
@@ -73,42 +74,40 @@ const year = new Date().getFullYear();
       Skip to content
     </a>
     <div aria-hidden="true" class="fixed inset-0 -z-10 pointer-events-none bg-gradient-to-br from-indigo-100/40 via-transparent to-purple-100/40 dark:from-indigo-900/20 dark:via-transparent dark:to-purple-900/20"></div>
-    <header
-      class="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50/80 backdrop-blur print:hidden dark:border-zinc-800 dark:bg-zinc-950/80"
-    >
-      <div class="mx-auto flex h-14 w-full max-w-3xl items-center justify-between px-4 sm:px-6">
-        <a
-          href="/"
-          class="text-sm font-semibold tracking-tight text-zinc-900 transition hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400"
-        >
-          Tin Le
-        </a>
-        <nav aria-label="Main navigation">
-          <ul class="flex items-center gap-1 sm:gap-2">
-            {
-              navItems.map((item) => (
-                <li>
-                  <a
-                    href={item.href}
-                    aria-current={isActive(item.href) ? "page" : undefined}
-                    class:list={[
-                      "btn-top-3d",
-                      isActive(item.href)
-                        ? "btn-top-3d--nav-active"
-                        : "btn-top-3d--nav",
-                    ]}
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
+    <main id="main" class="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6">
+      <div
+        class:list={[
+          "flex flex-wrap items-center justify-between gap-x-4 gap-y-3",
+          hasHeaderTitle ? "mb-1" : "mb-8",
+        ]}
+      >
+        <slot name="header-title" />
+        <header class="ml-auto print:hidden">
+          <nav aria-label="Main navigation">
+            <ul class="flex items-center gap-1.5 sm:gap-2">
+              {
+                navItems.map((item) => (
+                  <li>
+                    <a
+                      href={item.href}
+                      aria-current={isActive(item.href) ? "page" : undefined}
+                      class:list={[
+                        "btn-top-3d",
+                        isActive(item.href)
+                          ? "btn-top-3d--nav-active"
+                          : "btn-top-3d--nav",
+                      ]}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+        </header>
       </div>
-    </header>
 
-    <main id="main" class="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6">
       <slot />
     </main>
 

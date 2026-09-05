@@ -32,7 +32,7 @@ export interface ResumeData {
 
 export const resume: ResumeData = {
   fullName: "tin le",
-  headline: "Full-Stack .NET / Angular Developer",
+  headline: "Full-Stack Developer",
   contact: [
     { label: "📬", value: "thanhtin.le.vn@gmail.com", href: "mailto:thanhtin.le.vn@gmail.com" },
     { label: "📍", value: "Ho Chi Minh City / Remote" },
