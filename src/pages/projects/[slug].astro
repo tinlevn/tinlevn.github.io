@@ -1,9 +1,10 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { getCollection, render } from "astro:content";
+import { render } from "astro:content";
+import { getPublishedProjects } from "../../utils/collections";
 
 export async function getStaticPaths() {
-  const projects = await getCollection("projects", ({ data }) => !data.draft);
+  const projects = await getPublishedProjects();
   return projects.map((project) => ({
     params: { slug: project.id },
     props: { project },
@@ -26,7 +27,7 @@ const { title, period, summary, stack, links } = project.data;
 
     <header class="mt-4">
       <div class="flex flex-wrap items-baseline justify-between gap-x-4">
-        <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">{title}</h1>
+        <h1 class="page-title text-3xl">{title}</h1>
         <span class="text-sm text-zinc-600 dark:text-zinc-400">{period}</span>
       </div>
 

@@ -1,0 +1,29 @@
+---
+import type { ContactItem } from "../data/resume";
+
+interface Props {
+  item: ContactItem;
+}
+
+const { item } = Astro.props;
+const external = item.href?.startsWith("http");
+---
+
+<li>
+  {
+    item.href ? (
+      <a
+        href={item.href}
+        class="contact-chip"
+        rel="noopener noreferrer"
+        target={external ? "_blank" : undefined}
+      >
+        <span class="contact-chip__label">{item.label}</span> {item.value}
+      </a>
+    ) : (
+      <span class="contact-chip">
+        <span class="contact-chip__label">{item.label}</span> {item.value}
+      </span>
+    )
+  }
+</li>

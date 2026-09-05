@@ -1,10 +1,16 @@
 @import "tailwindcss";
+@import "@fontsource/geist-pixel/latin.css";
+@import "@fontsource-variable/geist-mono/wght.css";
 @plugin "@tailwindcss/typography";
 
 @theme {
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-mono:
+    "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-pixel: "Geist Pixel", ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
@@ -38,17 +44,44 @@ html {
   }
 }
 
-.animate-fade-in-up {
+.animate-fade-in-up,
+.stagger-in > * {
   animation: fade-in-up 0.6s ease-out forwards;
   opacity: 0;
 }
 
-/* ── Layered 3D Button (from btns project) ── */
-.btn-layered-3d,
-.btn-layered-3d > *,
-.btn-layered-3d > *::before,
-.btn-layered-3d > *::after {
-  box-sizing: border-box;
+.stagger-in > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-in > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-in > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-in > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-in > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-in > *:nth-child(6) { animation-delay: 0.6s; }
+
+.page-title {
+  @apply font-pixel tracking-tight text-zinc-900 dark:text-white;
+}
+
+.section-heading {
+  @apply text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400;
+}
+
+.resume-card {
+  @apply break-inside-avoid rounded-xl bg-transparent p-5 -mx-5 transition-all duration-300
+    hover:-translate-y-1 hover:bg-white hover:shadow-lg dark:hover:bg-zinc-900;
+}
+
+.contact-chip {
+  @apply inline-block rounded-full border border-zinc-200 bg-white px-3 py-1 text-sm text-zinc-600
+    dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400;
+}
+
+a.contact-chip {
+  @apply transition hover:border-indigo-300 hover:text-indigo-600
+    dark:hover:border-indigo-700 dark:hover:text-indigo-400;
+}
+
+.contact-chip__label {
+  @apply font-medium text-zinc-600 dark:text-zinc-400;
 }
 
 .btn-layered-3d {
@@ -60,78 +93,54 @@ html {
   vertical-align: middle;
   text-decoration: none;
   font-size: inherit;
-  font-family: inherit;
-  font-weight: 600;
+  font-family: var(--font-pixel);
+  font-weight: 400;
   text-transform: uppercase;
   padding: 0.6em 1.4em;
   border-radius: 0.75em;
   transform-style: preserve-3d;
-  transition: transform 150ms cubic-bezier(0, 0, 0.58, 1),
+  transition:
+    transform 150ms cubic-bezier(0, 0, 0.58, 1),
     background 150ms cubic-bezier(0, 0, 0.58, 1);
+
+  &::before {
+    position: absolute;
+    content: "";
+    inset: 0;
+    border-radius: inherit;
+    transform: translate3d(0, 0.75em, -1em);
+    transition:
+      transform 150ms cubic-bezier(0, 0, 0.58, 1),
+      box-shadow 150ms cubic-bezier(0, 0, 0.58, 1);
+  }
+
+  &:hover {
+    transform: translate(0, 0.25em);
+  }
+
+  &:hover::before {
+    transform: translate3d(0, 0.5em, -1em);
+  }
 }
 
-.btn-layered-3d::before {
-  position: absolute;
-  content: "";
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: inherit;
-  transform: translate3d(0, 0.75em, -1em);
-  transition: transform 150ms cubic-bezier(0, 0, 0.58, 1),
-    box-shadow 150ms cubic-bezier(0, 0, 0.58, 1);
-}
-
-.btn-layered-3d:hover {
-  transform: translate(0, 0.25em);
-}
-
-.btn-layered-3d:hover::before {
-  transform: translate3d(0, 0.5em, -1em);
+.btn-layered-3d--sm {
+  font-size: 0.6rem;
+  padding: 0.3em 0.7em;
 }
 
 .btn-layered-3d--green {
   color: hsl(134, 47%, 44%);
   background: hsl(134, 47%, 94%);
   border: 2px solid hsl(134, 47%, 44%);
-}
 
-.btn-layered-3d--green::before {
-  background: hsl(134, 47%, 74%);
-  box-shadow: 0 0 0 2px hsl(134, 47%, 44%),
-    0 0.625em 0 0 hsl(134, 47%, 94%);
-}
-
-@media (prefers-color-scheme: dark) {
-  .btn-layered-3d--green {
-    color: hsl(134, 60%, 70%);
-    background: hsl(134, 40%, 16%);
-    border-color: hsl(134, 50%, 50%);
-  }
-
-  .btn-layered-3d--green::before {
-    background: hsl(134, 40%, 25%);
-    box-shadow: 0 0 0 2px hsl(134, 50%, 50%),
-      0 0.625em 0 0 hsl(134, 40%, 16%);
+  &::before {
+    background: hsl(134, 47%, 74%);
+    box-shadow:
+      0 0 0 2px hsl(134, 47%, 44%),
+      0 0.625em 0 0 hsl(134, 47%, 94%);
   }
 }
 
-.dark .btn-layered-3d--green {
-  color: hsl(134, 60%, 70%);
-  background: hsl(134, 40%, 16%);
-  border-color: hsl(134, 50%, 50%);
-}
-
-.dark .btn-layered-3d--green::before {
-  background: hsl(134, 40%, 25%);
-  box-shadow: 0 0 0 2px hsl(134, 50%, 50%),
-    0 0.625em 0 0 hsl(134, 40%, 16%);
-}
-
-/* ── 3D Top Button (from btns project) ── */
 .btn-top-3d {
   display: inline-block;
   position: relative;
@@ -140,8 +149,8 @@ html {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 0.875rem;
-  font-weight: 500;
-  font-family: inherit;
+  font-weight: 400;
+  font-family: var(--font-pixel);
   color: #fff;
   text-decoration: none;
   transform: translate3d(0, 0, 0);
@@ -149,97 +158,132 @@ html {
   border: none;
   cursor: pointer;
   border-radius: 0.375rem;
-}
 
-.btn-top-3d:hover {
-  transform: translate3d(0, 6px, 0);
-}
-
-.btn-top-3d::after,
-.btn-top-3d::before {
-  content: "";
-  position: absolute;
-  top: 100%;
-  width: 50%;
-  height: 6px;
-  transition: 0.1s height, 0.1s background;
-}
-
-.btn-top-3d::after {
-  right: 0;
-  transform: skewX(-45deg);
-  transform-origin: 0 0;
-}
-
-.btn-top-3d::before {
-  left: 0;
-  transform: skewX(45deg);
-  transform-origin: 100% 0;
-}
-
-.btn-top-3d:hover::after,
-.btn-top-3d:hover::before {
-  height: 0;
-}
-
-/* Nav-specific dark/indigo variant */
-.btn-top-3d--nav {
-  background: hsl(240, 10%, 30%);
-  color: var(--color-zinc-400);
-}
-
-.btn-top-3d--nav::after,
-.btn-top-3d--nav::before {
-  background: hsl(240, 10%, 22%);
-}
-
-.btn-top-3d--nav:hover {
-  background: hsl(240, 10%, 22%);
-  color: #fff;
-}
-
-.btn-top-3d--nav-active {
-  background: hsl(240, 50%, 45%);
-  color: #fff;
-}
-
-.btn-top-3d--nav-active::after,
-.btn-top-3d--nav-active::before {
-  background: hsl(240, 50%, 35%);
-}
-
-.btn-top-3d--nav-active:hover {
-  background: hsl(240, 50%, 35%);
-}
-
-/* Light mode overrides for nav buttons */
-@media not (prefers-color-scheme: dark) {
-  .btn-top-3d--nav:not(.dark *) {
-    background: hsl(240, 5%, 88%);
-    color: var(--color-zinc-500);
+  &:hover {
+    transform: translate3d(0, 6px, 0);
   }
 
-  .btn-top-3d--nav:not(.dark *)::after,
-  .btn-top-3d--nav:not(.dark *)::before {
+  &::after,
+  &::before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    width: 50%;
+    height: 6px;
+    transition: 0.1s height, 0.1s background;
+  }
+
+  &::after {
+    right: 0;
+    transform: skewX(-45deg);
+    transform-origin: 0 0;
+  }
+
+  &::before {
+    left: 0;
+    transform: skewX(45deg);
+    transform-origin: 100% 0;
+  }
+
+  &:hover::after,
+  &:hover::before {
+    height: 0;
+  }
+}
+
+.btn-top-3d--nav {
+  background: hsl(240, 5%, 88%);
+  color: var(--color-zinc-500);
+
+  &::after,
+  &::before {
     background: hsl(240, 5%, 78%);
   }
 
-  .btn-top-3d--nav:not(.dark *):hover {
+  &:hover {
     background: hsl(240, 5%, 78%);
     color: var(--color-zinc-900);
   }
+}
 
-  .btn-top-3d--nav-active:not(.dark *) {
-    background: hsl(240, 60%, 60%);
+.btn-top-3d--nav-active {
+  background: hsl(240, 60%, 60%);
+  color: #fff;
+
+  &::after,
+  &::before {
+    background: hsl(240, 60%, 48%);
+  }
+
+  &:hover {
+    background: hsl(240, 60%, 48%);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-layered-3d--green {
+    color: hsl(134, 60%, 70%);
+    background: hsl(134, 40%, 16%);
+    border-color: hsl(134, 50%, 50%);
+
+    &::before {
+      background: hsl(134, 40%, 25%);
+      box-shadow:
+        0 0 0 2px hsl(134, 50%, 50%),
+        0 0.625em 0 0 hsl(134, 40%, 16%);
+    }
+  }
+
+  .btn-top-3d--nav {
+    background: hsl(240, 10%, 30%);
+    color: var(--color-zinc-400);
+
+    &::after,
+    &::before {
+      background: hsl(240, 10%, 22%);
+    }
+
+    &:hover {
+      background: hsl(240, 10%, 22%);
+      color: #fff;
+    }
+  }
+
+  .btn-top-3d--nav-active {
+    background: hsl(240, 50%, 45%);
     color: #fff;
+
+    &::after,
+    &::before {
+      background: hsl(240, 50%, 35%);
+    }
+
+    &:hover {
+      background: hsl(240, 50%, 35%);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 
-  .btn-top-3d--nav-active:not(.dark *)::after,
-  .btn-top-3d--nav-active:not(.dark *)::before {
-    background: hsl(240, 60%, 48%);
+  .animate-fade-in-up,
+  .stagger-in > * {
+    animation: none;
+    opacity: 1;
   }
 
-  .btn-top-3d--nav-active:not(.dark *):hover {
-    background: hsl(240, 60%, 48%);
+  .btn-layered-3d,
+  .btn-top-3d,
+  .resume-card {
+    transition: none;
+  }
+
+  .btn-layered-3d:hover,
+  .btn-top-3d:hover,
+  .resume-card:hover {
+    transform: none;
   }
 }

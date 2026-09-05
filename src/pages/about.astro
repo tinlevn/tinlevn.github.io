@@ -1,14 +1,14 @@
 ---
 import Base from "../layouts/Base.astro";
+import { EMAIL } from "../data/site";
 ---
 
 <Base
   title="About — Tin Le"
   description="About Tin Le, a full-stack software engineer working with C#, ASP.NET Core, and Angular."
 >
-  <article class="prose prose-zinc max-w-none dark:prose-invert">
-    <h1>About</h1>
-
+  <h1 class="page-title text-3xl">About</h1>
+  <article class="prose prose-zinc mt-6 max-w-none dark:prose-invert">
     <p>
       I'm Tin, a full-stack software engineer based in Ho Chi Minh City / Remote. I spend most of my time in
       the .NET world &mdash; building web applications with ASP.NET Core and Angular, modernizing
@@ -34,8 +34,10 @@ import Base from "../layouts/Base.astro";
     <ul>
       <li>Full Stack Software Developer at Orient Software (client: Netwealth Australia)</li>
       <li>Working daily with .NET 10, Angular 22, TypeScript, Azure, and PostgreSQL</li>
-      <li>Open to interesting problems &mdash; reach me at  
-        <a href="mailto:thanhtin.le.vn@gmail.com">  thanhtin.le.vn@gmail.com</a></li>
+      <li>
+        Open to interesting problems &mdash; reach me at
+        <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+      </li>
     </ul>
   </article>
 </Base>
