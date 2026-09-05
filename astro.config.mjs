@@ -9,6 +9,9 @@ export default defineConfig({
     defaultStrategy: "hover",
   },
   integrations: [sitemap()],
+  build: {
+    inlineStylesheets: "always",
+  },
   vite: {
     plugins: [tailwindcss()],
   },
