@@ -4,6 +4,7 @@ import ContactChip from "./ContactChip.astro";
 import Section from "./Section.astro";
 import { resume } from "../data/resume";
 import { getPublishedProjects } from "../utils/collections";
+import { CV_DOWNLOAD_URL } from "../data/site";
 
 const projects = await getPublishedProjects();
 
@@ -26,13 +27,13 @@ const skillColors = [
       >
         {resume.headline}
       </p>
-      <button
-        id="print-btn"
-        type="button"
+      <a
+        href={CV_DOWNLOAD_URL}
+        download
         class="btn-layered-3d btn-layered-3d--green btn-layered-3d--sm print:hidden"
       >
-        Print PDF
-      </button>
+        Download CV
+      </a>
     </div>
 
     <ul class="mt-5 flex flex-wrap gap-2">

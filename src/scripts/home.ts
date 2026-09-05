@@ -1,25 +1,57 @@
-class TextScramble {
-  private readonly el: HTMLElement;
-  private readonly chars = "!<>-_\\/[]{}=+*^?#$%&@~|;:,.·";
-  private frameRequest: number | null = null;
+export interface ScrambleOptions {
+  /** Delay in ms between each successive character resolving (wave speed) */
+  staggerMs?: number;
+  /** Duration in ms each character churns before locking in */
+  churnMs?: number;
+  /** Frame rate for glyph randomization (default 24 fps) */
+  fps?: number;
+}
 
-  constructor(el: HTMLElement) {
+const DEFAULT_CHARS = "!<>-_\\/[]{}=+*^?#$%&@~|;:,.·";
+
+export class TextScramble {
+  private readonly el: HTMLElement;
+  private readonly chars: string;
+  private frameId: number | null = null;
+  private isScrambling = false;
+
+  constructor(el: HTMLElement, chars = DEFAULT_CHARS) {
     this.el = el;
+    this.chars = chars;
   }
 
-  setText(newText: string): Promise<void> {
+  get running(): boolean {
+    return this.isScrambling;
+  }
+
+  cancel(): void {
+    if (this.frameId !== null) {
+      cancelAnimationFrame(this.frameId);
+      this.frameId = null;
+    }
+    this.isScrambling = false;
+  }
+
+  setText(newText: string, options: ScrambleOptions = {}): Promise<void> {
+    const { staggerMs = 144, churnMs = 600, fps = 30 } = options;
+
+    this.cancel();
+    this.isScrambling = true;
+
     const oldText = this.el.textContent ?? "";
     const length = Math.max(oldText.length, newText.length);
-    const staggerMs = 110;
-    const churnMs = 900;
-
-    if (this.frameRequest) cancelAnimationFrame(this.frameRequest);
+    const swapIntervalMs = 1000 / fps;
 
     return new Promise((resolve) => {
       const startTime = performance.now();
+      const currentGlyphs: string[] = [];
+      let lastSwapTime = 0;
 
       const update = () => {
         const elapsed = performance.now() - startTime;
+        const shouldSwap = elapsed - lastSwapTime >= swapIntervalMs;
+        if (shouldSwap) lastSwapTime = elapsed;
+
         let output = "";
         let complete = 0;
 
@@ -37,7 +69,10 @@ class TextScramble {
             output += "";
             complete++;
           } else if (elapsed >= i * staggerMs) {
-            output += this.chars[Math.floor(Math.random() * this.chars.length)];
+            if (shouldSwap || !currentGlyphs[i]) {
+              currentGlyphs[i] = this.chars[Math.floor(Math.random() * this.chars.length)];
+            }
+            output += currentGlyphs[i];
           } else {
             output += from;
             complete++;
@@ -47,56 +82,66 @@ class TextScramble {
         this.el.textContent = output;
 
         if (complete === length) {
+          this.isScrambling = false;
+          this.frameId = null;
           resolve();
         } else {
-          this.frameRequest = requestAnimationFrame(update);
+          this.frameId = requestAnimationFrame(update);
         }
       };
 
-      update();
+      this.frameId = requestAnimationFrame(update);
     });
   }
 }
 
-const pending = new Set<number>();
-
-function later(fn: () => void, ms: number) {
-  const id = window.setTimeout(() => {
-    pending.delete(id);
-    fn();
-  }, ms);
-  pending.add(id);
-}
-
-function initScramble() {
-  for (const id of pending) clearTimeout(id);
-  pending.clear();
-
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+/**
+ * Page-level coordinator for the home view.
+ * Returns an idempotent cleanup function to tear down timers, animation frames, and listeners.
+ */
+export function initHomePage(): () => void {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return () => {};
+  }
 
   const nameEl = document.getElementById("scramble-name");
   const headlineEl = document.getElementById("scramble-headline");
-  if (!nameEl || !headlineEl) return;
+  if (!nameEl || !headlineEl) return () => {};
 
   const nameTarget = nameEl.getAttribute("aria-label") ?? nameEl.textContent ?? "";
   const headlineTarget = headlineEl.getAttribute("aria-label") ?? headlineEl.textContent ?? "";
+
   const fxName = new TextScramble(nameEl);
   const fxHeadline = new TextScramble(headlineEl);
 
-  later(() => {
-    fxName.setText(nameTarget);
-    later(() => fxHeadline.setText(headlineTarget), 250);
+  const abortController = new AbortController();
+  const { signal } = abortController;
+
+  // Name: deliberate wave (350ms stagger)
+  // Headline: responsive wave (60ms stagger) so 20 chars don't take 8+ seconds
+  const timer1 = window.setTimeout(() => {
+    fxName.setText(nameTarget, { staggerMs: 350, churnMs: 600, fps: 30 });
   }, 150);
-}
 
-function initPrint() {
-  const btn = document.getElementById("print-btn");
-  if (!btn || btn.dataset.bound === "true") return;
-  btn.dataset.bound = "true";
-  btn.addEventListener("click", () => window.print());
-}
+  const timer2 = window.setTimeout(() => {
+    fxHeadline.setText(headlineTarget, { staggerMs: 60, churnMs: 600, fps: 30 });
+  }, 400);
 
-export function initHomePage() {
-  initScramble();
-  initPrint();
+  // Hover re-scramble (cleanly bound via AbortController signal)
+  nameEl.addEventListener(
+    "mouseenter",
+    () => {
+      if (fxName.running) return;
+      fxName.setText(nameTarget, { staggerMs: 350, churnMs: 600, fps: 30 });
+    },
+    { signal }
+  );
+
+  return () => {
+    clearTimeout(timer1);
+    clearTimeout(timer2);
+    abortController.abort();
+    fxName.cancel();
+    fxHeadline.cancel();
+  };
 }

@@ -18,6 +18,14 @@ import { resume } from "../data/resume";
   <script>
     import { initHomePage } from "../scripts/home";
 
-    document.addEventListener("astro:page-load", initHomePage);
+    let cleanup: (() => void) | undefined;
+    document.addEventListener("astro:page-load", () => {
+      cleanup?.();
+      cleanup = initHomePage();
+    });
+    document.addEventListener("astro:before-swap", () => {
+      cleanup?.();
+      cleanup = undefined;
+    });
   </script>
 </Base>
