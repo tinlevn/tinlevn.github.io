@@ -75,7 +75,6 @@ export class TextScramble {
             output += currentGlyphs[i];
           } else {
             output += from;
-            complete++;
           }
         }
 
