@@ -1,22 +1,27 @@
 ---
 import Base from "../layouts/Base.astro";
-import { EMAIL } from "../data/site";
 ---
 
 <Base
   title="About — Tin Le"
-  description="About Tin Le, a full-stack software engineer working with C#, ASP.NET Core, and Angular."
+  description="About Tin Le, a full-stack software engineer working with C#, .NET, and Angular."
 >
-  <h1 class="page-title text-3xl">About</h1>
+  <h1
+    slot="header-title"
+    class="page-title animate-fade-in-up text-4xl"
+    style="animation-delay: 0.1s"
+  >
+    about
+  </h1>
   <article class="prose prose-zinc mt-6 max-w-none dark:prose-invert">
     <p>
-      I'm Tin, a full-stack software engineer based in Ho Chi Minh City / Remote. I spend most of my time in
-      the .NET world &mdash; building web applications with ASP.NET Core and Angular, modernizing
+      I'm Tin, a full-stack software engineer based mainly in Ho Chi Minh City (but always open to Remote work). 
+      I spend most of my time in the .NET world &mdash; building web applications with .NET and Angular, modernizing
       legacy code bases, and wiring up CI/CD pipelines in Azure.
     </p>
 
     <p>
-      I graduated summa cum laude from Southeast Missouri State University with a B.S. in Computer
+      I graduated Summa Cum Laude from Southeast Missouri State University with a B.S. in Computer
       Science and a minor in Mathematics, finishing with a 3.94 GPA (4.0 in-major) as a Regent's
       Scholarship recipient. Since then I've worked as a Full Stack Developer delivering production
       full-stack features end to end across fintech (Netwealth), aviation (American Airlines), and
@@ -24,20 +29,16 @@ import { EMAIL } from "../data/site";
     </p>
 
     <p>
-      Outside of work I tinker on side projects like Smeexer, an e-commerce prototype for
-      mechanical keyboard products, and small Python tools. I enjoy the whole stack: designing an
-      API, shaping the frontend that consumes it, and making sure both ship reliably through good
-      pipelines.
+      Outside of work I tinker on side projects like Smeexer, and small Python tools. 
+      I enjoy the whole stack: designing an API, 
+      shaping the frontend that consumes it, and making sure both ship reliably through good pipelines.
     </p>
 
     <h2>Currently</h2>
     <ul>
-      <li>Full Stack Software Developer at Orient Software (client: Netwealth Australia)</li>
-      <li>Working daily with .NET 10, Angular 22, TypeScript, Azure, and PostgreSQL</li>
-      <li>
-        Open to interesting problems &mdash; reach me at
-        <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
-      </li>
+      <li>Working daily with .NET 10, Angular 22, TypeScript, Azure, and SSMS</li>
+      <li>Building a personal blog with Astro, Tailwind, and Markdown</li>
+      <li>Learning Go and exploring web development using agents</li>
     </ul>
   </article>
 </Base>

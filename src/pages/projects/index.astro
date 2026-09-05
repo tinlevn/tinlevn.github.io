@@ -10,12 +10,17 @@ const projects = await getPublishedProjects();
   title="Projects — Tin Le"
   description="Side projects and prototypes by Tin Le, spanning C#, ASP.NET Core, Angular, and Python."
 >
-  <header>
-    <h1 class="page-title text-3xl">Projects</h1>
-    <p class="mt-2 max-w-prose text-zinc-600 dark:text-zinc-400">
-      Things I have built outside of work — prototypes, tools, and experiments.
-    </p>
-  </header>
+  <h1
+    slot="header-title"
+    class="page-title animate-fade-in-up text-4xl"
+    style="animation-delay: 0.1s"
+  >
+    projects
+  </h1>
+
+  <p class="mt-3 max-w-prose text-zinc-600 dark:text-zinc-400">
+    Things I have built outside of work: prototypes, tools, and experiments.
+  </p>
 
   {projects.length > 0 && <h2 class="sr-only">Project list</h2>}
 
