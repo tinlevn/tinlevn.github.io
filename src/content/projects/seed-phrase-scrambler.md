@@ -4,7 +4,7 @@ period: "2021"
 summary: CLI tool that scrambles private seed phrases for secure offline and online storage.
 stack:
   - Python
-order: 2
+order: 3
 ---
 
 A command-line tool that scrambles the word order of private seed phrases so they

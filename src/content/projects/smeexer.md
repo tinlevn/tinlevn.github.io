@@ -6,7 +6,7 @@ stack:
   - C#
   - ASP.NET 6 Web API
   - Angular 13
-order: 1
+order: 2
 ---
 
 Smeexer is an e-commerce prototype for mechanical keyboard products, built as a
