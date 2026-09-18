@@ -85,10 +85,10 @@ const year = new Date().getFullYear();
                       href={item.href}
                       aria-current={isActive(item.href) ? "page" : undefined}
                       class:list={[
-                        "btn-top-3d",
+                        "btn-layered-3d",
                         isActive(item.href)
-                          ? "btn-top-3d--nav-active"
-                          : "btn-top-3d--nav",
+                          ? "btn-layered-3d--nav-active"
+                          : "btn-layered-3d--nav",
                       ]}
                     >
                       {item.label}

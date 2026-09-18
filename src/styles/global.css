@@ -84,7 +84,8 @@ a.contact-chip {
   @apply font-medium text-zinc-600 dark:text-zinc-400;
 }
 
-.btn-layered-3d {
+.btn-layered-3d,
+.btn-top-3d {
   position: relative;
   display: inline-block;
   cursor: pointer;
@@ -141,82 +142,62 @@ a.contact-chip {
   }
 }
 
-.btn-top-3d {
-  display: inline-block;
-  position: relative;
-  text-align: center;
-  padding: 0.5rem 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-size: 0.875rem;
-  font-weight: 400;
-  font-family: var(--font-pixel);
-  color: #fff;
-  text-decoration: none;
-  transform: translate3d(0, 0, 0);
-  transition: 0.1s background, 0.1s transform;
-  border: none;
-  cursor: pointer;
-  border-radius: 0.375rem;
-
-  &:hover {
-    transform: translate3d(0, 6px, 0);
-  }
-
-  &::after,
-  &::before {
-    content: "";
-    position: absolute;
-    top: 100%;
-    width: 50%;
-    height: 6px;
-    transition: 0.1s height, 0.1s background;
-  }
-
-  &::after {
-    right: 0;
-    transform: skewX(-45deg);
-    transform-origin: 0 0;
-  }
-
-  &::before {
-    left: 0;
-    transform: skewX(45deg);
-    transform-origin: 100% 0;
-  }
-
-  &:hover::after,
-  &:hover::before {
-    height: 0;
-  }
-}
-
-.btn-top-3d--nav {
-  background: hsl(240, 5%, 88%);
-  color: var(--color-zinc-500);
-
-  &::after,
-  &::before {
-    background: hsl(240, 5%, 78%);
-  }
-
-  &:hover {
-    background: hsl(240, 5%, 78%);
-    color: var(--color-zinc-900);
-  }
-}
-
+.btn-layered-3d--nav,
+.btn-layered-3d--nav-active,
+.btn-top-3d,
+.btn-top-3d--nav,
 .btn-top-3d--nav-active {
-  background: hsl(240, 60%, 60%);
-  color: #fff;
+  font-size: 0.8125rem;
+  padding: 0.45em 0.85em;
+  letter-spacing: 0.5px;
 
-  &::after,
   &::before {
-    background: hsl(240, 60%, 48%);
+    transform: translate3d(0, 0.35em, -1em);
   }
 
   &:hover {
+    transform: translate(0, 0.15em);
+  }
+
+  &:hover::before {
+    transform: translate3d(0, 0.2em, -1em);
+  }
+}
+
+.btn-layered-3d--nav,
+.btn-top-3d--nav {
+  color: var(--color-zinc-600);
+  background: hsl(240, 5%, 90%);
+  border: 2px solid hsl(240, 5%, 72%);
+
+  &::before {
+    background: hsl(240, 5%, 78%);
+    box-shadow:
+      0 0 0 2px hsl(240, 5%, 72%),
+      0 0.25em 0 0 hsl(240, 5%, 90%);
+  }
+
+  &:hover {
+    color: var(--color-zinc-950);
+    background: hsl(240, 5%, 84%);
+  }
+}
+
+.btn-layered-3d--nav-active,
+.btn-top-3d--nav-active {
+  color: #fff;
+  background: hsl(240, 60%, 60%);
+  border: 2px solid hsl(240, 60%, 46%);
+
+  &::before {
     background: hsl(240, 60%, 48%);
+    box-shadow:
+      0 0 0 2px hsl(240, 60%, 46%),
+      0 0.25em 0 0 hsl(240, 60%, 60%);
+  }
+
+  &:hover {
+    background: hsl(240, 60%, 55%);
   }
 }
 
@@ -234,32 +215,40 @@ a.contact-chip {
     }
   }
 
+  .btn-layered-3d--nav,
   .btn-top-3d--nav {
-    background: hsl(240, 10%, 30%);
-    color: var(--color-zinc-400);
+    color: var(--color-zinc-300);
+    background: hsl(240, 10%, 25%);
+    border-color: hsl(240, 10%, 42%);
 
-    &::after,
     &::before {
-      background: hsl(240, 10%, 22%);
+      background: hsl(240, 10%, 18%);
+      box-shadow:
+        0 0 0 2px hsl(240, 10%, 42%),
+        0 0.25em 0 0 hsl(240, 10%, 25%);
     }
 
     &:hover {
-      background: hsl(240, 10%, 22%);
       color: #fff;
+      background: hsl(240, 10%, 30%);
     }
   }
 
+  .btn-layered-3d--nav-active,
   .btn-top-3d--nav-active {
-    background: hsl(240, 50%, 45%);
     color: #fff;
+    background: hsl(240, 50%, 45%);
+    border-color: hsl(240, 55%, 60%);
 
-    &::after,
     &::before {
       background: hsl(240, 50%, 35%);
+      box-shadow:
+        0 0 0 2px hsl(240, 55%, 60%),
+        0 0.25em 0 0 hsl(240, 50%, 45%);
     }
 
     &:hover {
-      background: hsl(240, 50%, 35%);
+      background: hsl(240, 50%, 40%);
     }
   }
 }
